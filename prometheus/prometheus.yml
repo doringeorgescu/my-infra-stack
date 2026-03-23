@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s # Cât de des "întreabă" senzorii (15 secunde e standard)
+
+scrape_configs:
+  # Job-ul 1: Prometheus se monitorizează pe el însuși
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Job-ul 2: Aici colectăm datele de la sistem (Node Exporter)
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']

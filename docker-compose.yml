@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  # 1. SITE-UL TĂU (Imaginea Custom v2 cu bazăitoarea)
+  web-site:
+    image: site-custom:v2
+    container_name: nginx-web
+    ports:
+      - "80:80"
+    restart: always
+
+  # 2. CREIERUL (Imaginea Custom v1 cu prometheus.yml inclus)
+  prometheus:
+    image: monitor-prometheus:latest # Sau v1, depinde ce tag ai pus ultima dată
+    container_name: prometheus
+    # ACEASTA ESTE LINIA MAGICĂ:
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+    restart: always
+  # 3. SENZORUL (Imaginea Custom v1 pentru Node Exporter)
+  node-exporter:
+    image: monitor-node-exporter:v1
+    container_name: node-exporter
+    # Permisiuni speciale pentru a vedea hardware-ul VM-ului Ubuntu
+    ports:
+      - "9100:9100"
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/rootfs:ro"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)'
+    restart: always
+
+  # 4. TABLOUL DE BORD (Imagine Oficială + Volum pentru Persistență)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_storage:/var/lib/grafana
+    restart: always
+
+volumes:
+  prometheus_data:
+  grafana_storage:
