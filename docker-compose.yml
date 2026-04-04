@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. SITE-UL TĂU 
+  
   web-site:
     image: site-custom:v2
     container_name: nginx-web
@@ -9,7 +9,7 @@ services:
       - "80:80"
     restart: always
 
-  # 2. CREIERUL 
+ 
   prometheus:
     image: monitor-prometheus:latest 
     container_name: prometheus
