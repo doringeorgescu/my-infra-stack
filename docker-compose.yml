@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. SITE-UL TĂU (Imaginea Custom v2 cu bazăitoarea)
+  # 1. SITE-UL TAU
   web-site:
     image: site-custom:v2
     container_name: nginx-web
@@ -9,34 +9,34 @@ services:
       - "80:80"
     restart: always
 
-  # 2. CREIERUL (Imaginea Custom v1 cu prometheus.yml inclus)
+  # 2. PROMETHEUS (CREIERUL)
   prometheus:
-    image: monitor-prometheus:latest # Sau v1, depinde ce tag ai pus ultima dată
+    image: jet855/prometheus-custom:v2.0
     container_name: prometheus
-    # ACEASTA ESTE LINIA MAGICĂ:
     ports:
       - "9090:9090"
     volumes:
+      # Mapăm fișierul de setări pe care îl ai deja în folderul prometheus
       - prometheus_data:/prometheus
     restart: always
-  # 3. SENZORUL (Imaginea Custom v1 pentru Node Exporter)
+
+  # 3. NODE EXPORTER (SENZORUL)
   node-exporter:
-    image: monitor-node-exporter:v1
+    image: prom/node-exporter:latest
     container_name: node-exporter
-    # Permisiuni speciale pentru a vedea hardware-ul VM-ului Ubuntu
-    ports:
-      - "9100:9100"
+    # Folosim network_mode: host pentru a evita erorile de DNS de pe Oracle
+    network_mode: host
     volumes:
-      - "/proc:/host/proc:ro"
-      - "/sys:/host/sys:ro"
-      - "/:/rootfs:ro"
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)'
     restart: always
 
-  # 4. TABLOUL DE BORD (Imagine Oficială + Volum pentru Persistență)
+  # 4. GRAFANA (TABLOUL)
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
