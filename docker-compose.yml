@@ -1,30 +1,25 @@
 version: '3.8'
 
 services:
-  # 1. SITE-UL TAU
   web-site:
-    image: site-custom:v2
+    image: site-custom:v1.0
     container_name: nginx-web
     ports:
       - "80:80"
     restart: always
 
-  # 2. PROMETHEUS (CREIERUL)
   prometheus:
     image: jet855/prometheus-custom:v2.0
     container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
-      # Mapăm fișierul de setări pe care îl ai deja în folderul prometheus
       - prometheus_data:/prometheus
     restart: always
 
-  # 3. NODE EXPORTER (SENZORUL)
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
-    # Folosim network_mode: host pentru a evita erorile de DNS de pe Oracle
     network_mode: host
     volumes:
       - /proc:/host/proc:ro
@@ -36,7 +31,6 @@ services:
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($|/)'
     restart: always
 
-  # 4. GRAFANA (TABLOUL)
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
